@@ -21,6 +21,7 @@ echo "Welcome Citizen: " . $_SESSION['full_name'];
 <div class="nav-links">
     <a href="report_hazards.php">Report Hazards</a>
     <a href="my_reports.php">My Reports</a>
+    <a href="../login.php">Logout</a>
 </div>
 
 </body>
