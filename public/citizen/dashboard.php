@@ -1,3 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="citizen.css">
+</head>
+<body>
+
 <?php
 session_start();
 
@@ -8,5 +15,13 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'citizen') {
 
 echo "Welcome Citizen: " . $_SESSION['full_name'];
 ?>
-<a href="report_hazards.php">Report Hazards</a>
-<a href="my_reports.php">My Reports</a>
+
+<br>
+
+<div class="nav-links">
+    <a href="report_hazards.php">Report Hazards</a>
+    <a href="my_reports.php">My Reports</a>
+</div>
+
+</body>
+</html>
