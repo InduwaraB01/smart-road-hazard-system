@@ -135,6 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <br><br>
 
     <button type="submit">Submit Report</button>
+    <button type="button" onclick="window.location.href='dashboard.php'">Back to Dashboard</button>
 
 </form>
 

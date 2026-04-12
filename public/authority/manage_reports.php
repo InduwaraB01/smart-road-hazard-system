@@ -103,6 +103,7 @@ $result = $conn->query($sql);
             <br><br>
 
             <button type="submit" name="update_status">Update</button>
+            
         </form>
 
         <?php
@@ -129,6 +130,6 @@ $history = $conn->query("SELECT su.*, u.full_name
 <?php endwhile; ?>
 
 </table>
-
+<button type="button" onclick="window.location.href='dashboard.php'">Back to Dashboard</button>
 </body>
 </html>
