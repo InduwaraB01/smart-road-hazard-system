@@ -81,6 +81,8 @@ new Chart(ctx, {
 <a href="manage_reports.php">Manage Reports</a><br><br>
 <a href="change_password.php">Change Password</a><br><br>
 <a href="../login.php">Logout</a>
+<br><br>
+<a href="map_view.php">View Hazard Map</a>
 
 </body>
 </html>
