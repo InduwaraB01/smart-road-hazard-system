@@ -7,6 +7,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'authority') {
     exit();
 }
 
+// Stats
 $total = $conn->query("SELECT COUNT(*) as c FROM hazards")->fetch_assoc()['c'];
 $reported = $conn->query("SELECT COUNT(*) as c FROM hazards WHERE status='Reported'")->fetch_assoc()['c'];
 $progress = $conn->query("SELECT COUNT(*) as c FROM hazards WHERE status='In Progress'")->fetch_assoc()['c'];
@@ -24,11 +25,16 @@ $rejected = $conn->query("SELECT COUNT(*) as c FROM hazards WHERE status='Reject
 
 <div class="container">
 
+    <!-- HEADER -->
     <header>
-        <h2>Authority Dashboard</h2>
+        <div class="header-content">
+            <img src="../assets/images/dashboard.png" class="icon">
+            <h2>Authority Dashboard</h2>
+        </div>
         <p>Welcome, <?php echo $_SESSION['full_name']; ?></p>
     </header>
 
+    <!-- NAVIGATION -->
     <nav>
         <a href="dashboard.php">Dashboard</a>
         <a href="manage_reports.php">Manage Reports</a>
@@ -37,14 +43,40 @@ $rejected = $conn->query("SELECT COUNT(*) as c FROM hazards WHERE status='Reject
         <a href="../logout.php">Logout</a>
     </nav>
 
+    <!-- STATS -->
     <section class="stats">
-        <div class="card">Total<br><?php echo $total; ?></div>
-        <div class="card">Reported<br><?php echo $reported; ?></div>
-        <div class="card">In Progress<br><?php echo $progress; ?></div>
-        <div class="card">Resolved<br><?php echo $resolved; ?></div>
-        <div class="card">Rejected<br><?php echo $rejected; ?></div>
+        <div class="card">
+            <img src="../assets/images/hazard.png">
+            <p>Total</p>
+            <h3><?php echo $total; ?></h3>
+        </div>
+
+        <div class="card">
+            <img src="../assets/images/hazard.png">
+            <p>Reported</p>
+            <h3><?php echo $reported; ?></h3>
+        </div>
+
+        <div class="card">
+            <img src="../assets/images/hazard.png">
+            <p>In Progress</p>
+            <h3><?php echo $progress; ?></h3>
+        </div>
+
+        <div class="card">
+            <img src="../assets/images/hazard.png">
+            <p>Resolved</p>
+            <h3><?php echo $resolved; ?></h3>
+        </div>
+
+        <div class="card">
+            <img src="../assets/images/hazard.png">
+            <p>Rejected</p>
+            <h3><?php echo $rejected; ?></h3>
+        </div>
     </section>
 
+    <!-- CHART -->
     <section class="chart">
         <canvas id="statusChart"></canvas>
     </section>
@@ -67,6 +99,9 @@ new Chart(document.getElementById('statusChart'), {
                 <?php echo $rejected; ?>
             ]
         }]
+    },
+    options: {
+        responsive: true
     }
 });
 </script>

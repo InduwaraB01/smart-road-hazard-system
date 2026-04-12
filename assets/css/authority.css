@@ -9,12 +9,25 @@ body {
     margin: auto;
 }
 
+/* HEADER */
 header {
-    background: #2c3e50;
+    background: url('../images/road.jpg');
+    background-size: cover;
     color: white;
-    padding: 15px;
+    padding: 20px;
 }
 
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.icon {
+    width: 40px;
+}
+
+/* NAVBAR */
 nav {
     background: #34495e;
     padding: 10px;
@@ -26,6 +39,7 @@ nav a {
     text-decoration: none;
 }
 
+/* CARDS */
 .stats {
     display: flex;
     gap: 15px;
@@ -41,6 +55,12 @@ nav a {
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
 }
 
+.card img {
+    width: 40px;
+    margin-bottom: 10px;
+}
+
+/* CHART */
 .chart {
     margin-top: 30px;
     background: white;
