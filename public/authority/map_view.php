@@ -47,11 +47,29 @@ function initMap() {
             lat: parseFloat(h.latitude),
             lng: parseFloat(h.longitude)
         };
+        let iconUrl = "";
 
-        const marker = new google.maps.Marker({
-            position: position,
-            map: map
-        });
+// Set color based on severity
+if (h.severity === "Low") {
+    iconUrl = "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
+} 
+else if (h.severity === "Medium") {
+    iconUrl = "http://maps.google.com/mapfiles/ms/icons/orange-dot.png";
+} 
+else if (h.severity === "High") {
+    iconUrl = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+} 
+else {
+    iconUrl = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+}
+
+const marker = new google.maps.Marker({
+    position: position,
+    map: map,
+    icon: iconUrl
+});
+
+        
 
         const info = new google.maps.InfoWindow({
             content: `
@@ -72,6 +90,6 @@ function initMap() {
 <script async
 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhRBe6aJUCBV2ue8RJdocUdh3xiGhuHE4&callback=initMap">
 </script>
-
+<button type="button" onclick="window.location.href='dashboard.php'">Back to Dashboard</button>
 </body>
 </html>
