@@ -2,109 +2,124 @@
 session_start();
 include("../../config/db.php");
 
+// Restrict access
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'authority') {
     header("Location: ../login.php");
     exit();
 }
 
-// Stats
-$total = $conn->query("SELECT COUNT(*) as c FROM hazards")->fetch_assoc()['c'];
-$reported = $conn->query("SELECT COUNT(*) as c FROM hazards WHERE status='Reported'")->fetch_assoc()['c'];
-$progress = $conn->query("SELECT COUNT(*) as c FROM hazards WHERE status='In Progress'")->fetch_assoc()['c'];
-$resolved = $conn->query("SELECT COUNT(*) as c FROM hazards WHERE status='Resolved'")->fetch_assoc()['c'];
-$rejected = $conn->query("SELECT COUNT(*) as c FROM hazards WHERE status='Rejected'")->fetch_assoc()['c'];
+// Fetch stats
+$total = $conn->query("SELECT COUNT(*) as count FROM hazards")->fetch_assoc()['count'];
+$reported = $conn->query("SELECT COUNT(*) as count FROM hazards WHERE status='Reported'")->fetch_assoc()['count'];
+$progress = $conn->query("SELECT COUNT(*) as count FROM hazards WHERE status='In Progress'")->fetch_assoc()['count'];
+$resolved = $conn->query("SELECT COUNT(*) as count FROM hazards WHERE status='Resolved'")->fetch_assoc()['count'];
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
     <title>Authority Dashboard</title>
-    <link rel="stylesheet" href="../assets/css/authority.css">
+
+    <!-- ✅ Correct CSS Path -->
+    <link rel="stylesheet" href="../../assets/css/authority.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: url('../../assets/images/road.jpg') no-repeat center center/cover;
+        }
+
+        .navbar {
+            background: #222;
+            padding: 15px;
+            color: white;
+        }
+
+        .navbar a {
+            color: white;
+            margin-right: 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .container {
+            padding: 20px;
+            color: white;
+        }
+
+        .cards {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: rgba(0,0,0,0.7);
+            padding: 20px;
+            border-radius: 10px;
+            width: 200px;
+            text-align: center;
+        }
+
+        .card img {
+            width: 50px;
+            margin-bottom: 10px;
+        }
+
+        .card h3 {
+            margin: 10px 0;
+        }
+
+        .card p {
+            font-size: 22px;
+            font-weight: bold;
+        }
+    </style>
 </head>
+
 <body>
 
-<div class="container">
-
-    <!-- HEADER -->
-    <header>
-        <div class="header-content">
-            <img src="../assets/images/dashboard.png" class="icon">
-            <h2>Authority Dashboard</h2>
-        </div>
-        <p>Welcome, <?php echo $_SESSION['full_name']; ?></p>
-    </header>
-
-    <!-- NAVIGATION -->
-    <nav>
-        <a href="dashboard.php">Dashboard</a>
-        <a href="manage_reports.php">Manage Reports</a>
-        <a href="map_view.php">Map</a>
-        <a href="change_password.php">Change Password</a>
-        <a href="../logout.php">Logout</a>
-    </nav>
-
-    <!-- STATS -->
-    <section class="stats">
-        <div class="card">
-            <img src="../assets/images/hazard.png">
-            <p>Total</p>
-            <h3><?php echo $total; ?></h3>
-        </div>
-
-        <div class="card">
-            <img src="../assets/images/hazard.png">
-            <p>Reported</p>
-            <h3><?php echo $reported; ?></h3>
-        </div>
-
-        <div class="card">
-            <img src="../assets/images/hazard.png">
-            <p>In Progress</p>
-            <h3><?php echo $progress; ?></h3>
-        </div>
-
-        <div class="card">
-            <img src="../assets/images/hazard.png">
-            <p>Resolved</p>
-            <h3><?php echo $resolved; ?></h3>
-        </div>
-
-        <div class="card">
-            <img src="../assets/images/hazard.png">
-            <p>Rejected</p>
-            <h3><?php echo $rejected; ?></h3>
-        </div>
-    </section>
-
-    <!-- CHART -->
-    <section class="chart">
-        <canvas id="statusChart"></canvas>
-    </section>
-
+<div class="navbar">
+    Welcome, <?php echo $_SESSION['full_name']; ?> |
+    <a href="dashboard.php">Dashboard</a>
+    <a href="manage_reports.php">Manage Reports</a>
+    <a href="map.php">Map</a>
+    <a href="change_password.php">Change Password</a>
+    <a href="../logout.php">Logout</a>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div class="container">
+    <h2>Authority Dashboard</h2>
 
-<script>
-new Chart(document.getElementById('statusChart'), {
-    type: 'bar',
-    data: {
-        labels: ['Reported', 'In Progress', 'Resolved', 'Rejected'],
-        datasets: [{
-            label: 'Hazards',
-            data: [
-                <?php echo $reported; ?>,
-                <?php echo $progress; ?>,
-                <?php echo $resolved; ?>,
-                <?php echo $rejected; ?>
-            ]
-        }]
-    },
-    options: {
-        responsive: true
-    }
-});
-</script>
+    <div class="cards">
+
+        <div class="card">
+            <img src="../../assets/images/dashboard.png">
+            <h3>Total Reports</h3>
+            <p><?php echo $total; ?></p>
+        </div>
+
+        <div class="card">
+            <img src="../../assets/images/hazard.png">
+            <h3>Reported</h3>
+            <p><?php echo $reported; ?></p>
+        </div>
+
+        <div class="card">
+            <img src="../../assets/images/progress.png">
+            <h3>In Progress</h3>
+            <p><?php echo $progress; ?></p>
+        </div>
+
+        <div class="card">
+            <img src="../../assets/images/resolved.png">
+            <h3>Resolved</h3>
+            <p><?php echo $resolved; ?></p>
+        </div>
+
+    </div>
+</div>
 
 </body>
 </html>
