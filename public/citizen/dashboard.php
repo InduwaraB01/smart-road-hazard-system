@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="citizen.css">
+    <link rel="stylesheet" href="../assets/css/citizen.css">
+    <title>Citizen Dashboard</title>
 </head>
 <body>
 

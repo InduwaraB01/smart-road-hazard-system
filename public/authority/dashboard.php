@@ -2,13 +2,11 @@
 session_start();
 include("../../config/db.php");
 
-// Restrict access
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'authority') {
     header("Location: ../login.php");
     exit();
 }
 
-// Fetch stats
 $total = $conn->query("SELECT COUNT(*) as c FROM hazards")->fetch_assoc()['c'];
 $reported = $conn->query("SELECT COUNT(*) as c FROM hazards WHERE status='Reported'")->fetch_assoc()['c'];
 $progress = $conn->query("SELECT COUNT(*) as c FROM hazards WHERE status='In Progress'")->fetch_assoc()['c'];
@@ -20,41 +18,48 @@ $rejected = $conn->query("SELECT COUNT(*) as c FROM hazards WHERE status='Reject
 <html>
 <head>
     <title>Authority Dashboard</title>
+    <link rel="stylesheet" href="../assets/css/authority.css">
 </head>
 <body>
 
-<h2>Welcome Authority: <?php echo $_SESSION['full_name']; ?></h2>
+<div class="container">
 
-<hr>
+    <header>
+        <h2>Authority Dashboard</h2>
+        <p>Welcome, <?php echo $_SESSION['full_name']; ?></p>
+    </header>
 
-<h3>System Overview</h3>
+    <nav>
+        <a href="dashboard.php">Dashboard</a>
+        <a href="manage_reports.php">Manage Reports</a>
+        <a href="map_view.php">Map</a>
+        <a href="change_password.php">Change Password</a>
+        <a href="../logout.php">Logout</a>
+    </nav>
 
-<ul>
-    <li><b>Total Reports:</b> <?php echo $total; ?></li>
-    <li><b>Reported:</b> <?php echo $reported; ?></li>
-    <li><b>In Progress:</b> <?php echo $progress; ?></li>
-    <li><b>Resolved:</b> <?php echo $resolved; ?></li>
-    <li><b>Rejected:</b> <?php echo $rejected; ?></li>
-</ul>
+    <section class="stats">
+        <div class="card">Total<br><?php echo $total; ?></div>
+        <div class="card">Reported<br><?php echo $reported; ?></div>
+        <div class="card">In Progress<br><?php echo $progress; ?></div>
+        <div class="card">Resolved<br><?php echo $resolved; ?></div>
+        <div class="card">Rejected<br><?php echo $rejected; ?></div>
+    </section>
 
-<hr>
+    <section class="chart">
+        <canvas id="statusChart"></canvas>
+    </section>
 
-<h3>Report Status Chart</h3>
+</div>
 
-<canvas id="statusChart" width="400" height="200"></canvas>
-
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-const ctx = document.getElementById('statusChart').getContext('2d');
-
-new Chart(ctx, {
+new Chart(document.getElementById('statusChart'), {
     type: 'bar',
     data: {
         labels: ['Reported', 'In Progress', 'Resolved', 'Rejected'],
         datasets: [{
-            label: 'Hazard Reports',
+            label: 'Hazards',
             data: [
                 <?php echo $reported; ?>,
                 <?php echo $progress; ?>,
@@ -62,27 +67,9 @@ new Chart(ctx, {
                 <?php echo $rejected; ?>
             ]
         }]
-    },
-    options: {
-        responsive: true,
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
     }
 });
 </script>
-
-<hr>
-
-<h3>Actions</h3>
-
-<a href="manage_reports.php">Manage Reports</a><br><br>
-<a href="change_password.php">Change Password</a><br><br>
-<a href="../login.php">Logout</a>
-<br><br>
-<a href="map_view.php">View Hazard Map</a>
 
 </body>
 </html>
