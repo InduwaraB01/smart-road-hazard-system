@@ -78,7 +78,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'citizen') {
     <a href="dashboard.php">Dashboard</a>
     <a href="report_hazard.php">Report Hazard</a>
     <a href="my_reports.php">My Reports</a>
-    <a href="../logout.php">Logout</a>
+    <a href="../login.php">Logout</a>
 </div>
 
 <div class="container">
@@ -87,7 +87,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'citizen') {
     <div class="cards">
 
         <!-- Report Hazard -->
-        <div class="card" onclick="window.location.href='report_hazard.php'">
+        <div class="card" onclick="window.location.href='report_hazards.php'">
             <img src="../../assets/images/hazard.png">
             <h3>Report Hazard</h3>
             <p>Submit a new road issue</p>
@@ -100,13 +100,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'citizen') {
             <p>View your submitted reports</p>
         </div>
 
-        <!-- Map View -->
-        <div class="card" onclick="window.location.href='../authority/map_view.php'">
-            <img src="../../assets/images/map.png">
-            <h3>View Map</h3>
-            <p>See all hazards on map</p>
-        </div>
-
+       
     </div>
 </div>
 

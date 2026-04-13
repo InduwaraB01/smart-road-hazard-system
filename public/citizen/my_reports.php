@@ -2,7 +2,7 @@
 session_start();
 include("../../config/db.php");
 
-// Restrict to citizen only
+// Restrict access
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'citizen') {
     header("Location: ../login.php");
     exit();
@@ -10,29 +10,101 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'citizen') {
 
 $user_id = $_SESSION['user_id'];
 
-// Fetch only logged-in user's hazards
+// Fetch user reports
 $sql = "SELECT h.*, c.category_name 
         FROM hazards h
         JOIN categories c ON h.category_id = c.category_id
-        WHERE h.user_id = ?
+        WHERE h.user_id = $user_id
         ORDER BY h.created_at DESC";
 
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
+$result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
     <title>My Reports</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            background: #f4f6f9;
+        }
+
+        .navbar {
+            background: #222;
+            padding: 15px;
+            color: white;
+        }
+
+        .navbar a {
+            color: white;
+            margin-right: 15px;
+            text-decoration: none;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background: #333;
+            color: white;
+        }
+
+        img {
+            border-radius: 6px;
+        }
+
+        /* STATUS COLORS */
+        .status-Reported { color: orange; font-weight: bold; }
+        .status-In\ Progress { color: blue; font-weight: bold; }
+        .status-Resolved { color: green; font-weight: bold; }
+        .status-Rejected { color: red; font-weight: bold; }
+
+        .history {
+            font-size: 12px;
+            text-align: left;
+            background: #f9f9f9;
+            padding: 5px;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+
+        .map-link {
+            color: blue;
+            text-decoration: underline;
+        }
+    </style>
 </head>
+
 <body>
+
+<div class="navbar">
+    <a href="dashboard.php">Dashboard</a>
+    <a href="report_hazard.php">Report Hazard</a>
+    <a href="my_reports.php">My Reports</a>
+    <a href="../logout.php">Logout</a>
+</div>
+
+<div class="container">
 
 <h2>My Hazard Reports</h2>
 
-<table border="1" cellpadding="8">
+<table>
 <tr>
     <th>ID</th>
     <th>Category</th>
@@ -41,7 +113,7 @@ $result = $stmt->get_result();
     <th>Location</th>
     <th>Image</th>
     <th>Status</th>
-    <th>Status History</th>
+    <th>History</th>
 </tr>
 
 <?php while($row = $result->fetch_assoc()): ?>
@@ -52,49 +124,47 @@ $result = $stmt->get_result();
     <td><?= $row['severity'] ?></td>
 
     <td>
-        <a href="https://www.google.com/maps?q=<?= $row['latitude'] ?>,<?= $row['longitude'] ?>" target="_blank">
-            View Map
+        <a class="map-link" target="_blank"
+        href="https://www.google.com/maps?q=<?= $row['latitude'] ?>,<?= $row['longitude'] ?>">
+        View Map
         </a>
     </td>
 
     <td>
-        <img src="../../<?= $row['image_path'] ?>" width="100">
+        <img src="../../<?= $row['image_path'] ?>" width="80">
+    </td>
+
+    <td class="status-<?= str_replace(' ', '\\ ', $row['status']) ?>">
+        <?= $row['status'] ?>
     </td>
 
     <td>
-        <b><?= $row['status'] ?></b>
-    </td>
-
-    <td>
+        <div class="history">
         <?php
         $hid = $row['hazard_id'];
-
-        $history = $conn->prepare("SELECT su.*, u.full_name 
+        $history = $conn->query("SELECT su.*, u.full_name 
             FROM status_updates su
             JOIN users u ON su.updated_by = u.user_id
-            WHERE su.hazard_id = ?
+            WHERE su.hazard_id = $hid
             ORDER BY su.updated_at DESC");
 
-        $history->bind_param("i", $hid);
-        $history->execute();
-        $history_result = $history->get_result();
-
-        while($h = $history_result->fetch_assoc()):
+        while($h = $history->fetch_assoc()):
         ?>
-            <div style="font-size:12px;">
-                <?= $h['updated_at'] ?> -
-                <b><?= $h['status'] ?></b> by
-                <?= htmlspecialchars($h['full_name']) ?><br>
-                Remarks: <?= htmlspecialchars($h['remarks']) ?>
-            </div>
-            <hr>
+            <?= $h['updated_at'] ?><br>
+            <?= $h['status'] ?> by <?= htmlspecialchars($h['full_name']) ?><br>
+            <i><?= htmlspecialchars($h['remarks']) ?></i><br><br>
         <?php endwhile; ?>
-
+        </div>
     </td>
 </tr>
 <?php endwhile; ?>
 
 </table>
+
+<br>
+<button onclick="window.location.href='dashboard.php'">Back to Dashboard</button>
+
+</div>
 
 </body>
 </html>
