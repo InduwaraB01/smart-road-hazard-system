@@ -20,8 +20,11 @@ $resolved = $conn->query("SELECT COUNT(*) as count FROM hazards WHERE status='Re
 <head>
     <title>Authority Dashboard</title>
 
-    <!-- ✅ Correct CSS Path -->
+    <!-- CSS -->
     <link rel="stylesheet" href="../../assets/css/authority.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         body {
@@ -75,6 +78,13 @@ $resolved = $conn->query("SELECT COUNT(*) as count FROM hazards WHERE status='Re
             font-size: 22px;
             font-weight: bold;
         }
+
+        canvas {
+            background: white;
+            margin-top: 30px;
+            border-radius: 10px;
+            padding: 10px;
+        }
     </style>
 </head>
 
@@ -92,6 +102,7 @@ $resolved = $conn->query("SELECT COUNT(*) as count FROM hazards WHERE status='Re
 <div class="container">
     <h2>Authority Dashboard</h2>
 
+    <!-- Cards -->
     <div class="cards">
 
         <div class="card">
@@ -107,7 +118,7 @@ $resolved = $conn->query("SELECT COUNT(*) as count FROM hazards WHERE status='Re
         </div>
 
         <div class="card">
-            <img src="../../assets/images/progress.png">
+            <img src="../../assets/images/in_progress.png">
             <h3>In Progress</h3>
             <p><?php echo $progress; ?></p>
         </div>
@@ -119,7 +130,47 @@ $resolved = $conn->query("SELECT COUNT(*) as count FROM hazards WHERE status='Re
         </div>
 
     </div>
+
+    <!-- Graph -->
+    <canvas id="hazardChart" height="120"></canvas>
+
 </div>
+
+<!-- Chart Script -->
+<script>
+const ctx = document.getElementById('hazardChart');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Reported', 'In Progress', 'Resolved'],
+        datasets: [{
+            label: 'Hazard Status Overview',
+            data: [
+                <?php echo $reported; ?>,
+                <?php echo $progress; ?>,
+                <?php echo $resolved; ?>
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                labels: {
+                    color: 'black'
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
 
 </body>
 </html>
