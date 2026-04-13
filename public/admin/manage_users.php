@@ -2,7 +2,6 @@
 session_start();
 include("../../config/db.php");
 
-// Only admin allowed
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
     header("Location: ../login.php");
     exit();
@@ -11,9 +10,14 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
 $success = "";
 $error = "";
 
-// ADD USER
-if (isset($_POST['add_user'])) {
+// ➤ SEARCH
+$search = "";
+if (isset($_GET['search'])) {
+    $search = trim($_GET['search']);
+}
 
+// ➤ ADD USER
+if (isset($_POST['add_user'])) {
     $name = trim($_POST['full_name']);
     $email = trim($_POST['email']);
     $password = $_POST['password'];
@@ -34,120 +38,137 @@ if (isset($_POST['add_user'])) {
             $stmt = $conn->prepare("INSERT INTO users (full_name, email, password, role) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("ssss", $name, $email, $hashed, $role);
 
-            if ($stmt->execute()) {
-                $success = "User created successfully!";
-            } else {
-                $error = "Error creating user.";
-            }
+            if ($stmt->execute()) $success = "User created!";
+            else $error = "Error creating user.";
 
             $stmt->close();
         }
-
         $check->close();
-    } else {
-        $error = "All fields are required.";
     }
 }
 
-// DELETE USER
+// ➤ DELETE
 if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
-
     if ($id != $_SESSION['user_id']) {
-        $conn->query("DELETE FROM users WHERE user_id = $id");
+        $conn->query("DELETE FROM users WHERE user_id=$id");
     }
 }
 
-// FETCH USERS
-$result = $conn->query("SELECT * FROM users ORDER BY created_at DESC");
+// ➤ UPDATE USER
+if (isset($_POST['update_user'])) {
+    $id = intval($_POST['user_id']);
+    $name = $_POST['full_name'];
+    $email = $_POST['email'];
+    $role = $_POST['role'];
+
+    $stmt = $conn->prepare("UPDATE users SET full_name=?, email=?, role=? WHERE user_id=?");
+    $stmt->bind_param("sssi", $name, $email, $role, $id);
+
+    if ($stmt->execute()) $success = "User updated!";
+    else $error = "Update failed.";
+
+    $stmt->close();
+}
+
+// ➤ FETCH USERS (WITH SEARCH)
+if ($search != "") {
+    $stmt = $conn->prepare("SELECT * FROM users WHERE full_name LIKE ? OR email LIKE ?");
+    $like = "%$search%";
+    $stmt->bind_param("ss", $like, $like);
+    $stmt->execute();
+    $result = $stmt->get_result();
+} else {
+    $result = $conn->query("SELECT * FROM users ORDER BY created_at DESC");
+}
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Manage Users</title>
+<title>Manage Users</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial;
-            background: url('../../assets/images/admin-bg.jpg') no-repeat center center/cover;
-        }
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: url('../../assets/images/admin-bg.jpg') no-repeat center/cover;
+}
 
-        .navbar {
-            background: #111;
-            padding: 15px;
-            color: white;
-        }
+.navbar {
+    background: #111;
+    padding: 15px;
+    color: white;
+}
 
-        .navbar a {
-            color: white;
-            margin-right: 15px;
-            text-decoration: none;
-            font-weight: bold;
-        }
+.navbar a {
+    color: white;
+    margin-right: 15px;
+    text-decoration: none;
+}
 
-        .container {
-            padding: 20px;
-            color: white;
-        }
+.container {
+    padding: 20px;
+    color: white;
+}
 
-        .card {
-            background: rgba(0,0,0,0.75);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
+.card {
+    background: rgba(0,0,0,0.75);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
 
-        input, select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border: none;
-        }
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 8px;
+}
 
-        button {
-            padding: 10px;
-            background: #28a745;
-            border: none;
-            color: white;
-            cursor: pointer;
-            width: 100%;
-        }
+button {
+    padding: 8px;
+    background: green;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
 
-        button:hover {
-            background: #218838;
-        }
+table {
+    width: 100%;
+    background: white;
+    color: black;
+    border-collapse: collapse;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            color: black;
-        }
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
 
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            text-align: center;
-        }
+th {
+    background: #333;
+    color: white;
+}
 
-        th {
-            background: #333;
-            color: white;
-        }
+/* ROLE COLORS */
+.role-admin { color: limegreen; font-weight: bold; }
+.role-authority { color: blue; font-weight: bold; }
+.role-citizen { color: orange; font-weight: bold; }
 
-        .delete-btn {
-            color: red;
-            font-weight: bold;
-        }
+.edit-form {
+    display: none;
+}
+</style>
 
-        .success { color: lightgreen; }
-        .error { color: red; }
-    </style>
+<script>
+function toggleEdit(id) {
+    var form = document.getElementById("edit-" + id);
+    form.style.display = (form.style.display === "none") ? "block" : "none";
+}
+</script>
+
 </head>
-
 <body>
 
 <div class="navbar">
@@ -155,7 +176,6 @@ $result = $conn->query("SELECT * FROM users ORDER BY created_at DESC");
     <a href="manage_users.php">Users</a>
     <a href="manage_categories.php">Categories</a>
     <a href="manage_reports.php">Reports</a>
-    <a href="change_password.php">Change Password</a>
     <a href="../logout.php">Logout</a>
 </div>
 
@@ -163,63 +183,78 @@ $result = $conn->query("SELECT * FROM users ORDER BY created_at DESC");
 
 <h2>Manage Users</h2>
 
-<?php if ($success): ?>
-    <p class="success"><?php echo $success; ?></p>
-<?php endif; ?>
+<p style="color:lightgreen;"><?php echo $success; ?></p>
+<p style="color:red;"><?php echo $error; ?></p>
 
-<?php if ($error): ?>
-    <p class="error"><?php echo $error; ?></p>
-<?php endif; ?>
+<!-- SEARCH -->
+<div class="card">
+<form method="GET">
+    <input type="text" name="search" placeholder="Search users..." value="<?= $search ?>">
+    <button type="submit">Search</button>
+</form>
+</div>
 
 <!-- ADD USER -->
 <div class="card">
-<h3>Add New User</h3>
-
+<h3>Add User</h3>
 <form method="POST">
-    <input type="text" name="full_name" placeholder="Full Name" required>
+    <input type="text" name="full_name" placeholder="Name" required>
     <input type="email" name="email" placeholder="Email" required>
     <input type="password" name="password" placeholder="Password" required>
 
-    <select name="role" required>
+    <select name="role">
         <option value="citizen">Citizen</option>
         <option value="authority">Authority</option>
         <option value="admin">Admin</option>
     </select>
 
-    <button type="submit" name="add_user">Add User</button>
+    <button name="add_user">Add</button>
 </form>
 </div>
 
-<!-- USER LIST -->
+<!-- USERS TABLE -->
 <div class="card">
-<h3>User List</h3>
-
 <table>
 <tr>
-    <th>ID</th>
-    <th>Name</th>
-    <th>Email</th>
-    <th>Role</th>
-    <th>Created</th>
-    <th>Action</th>
+<th>ID</th>
+<th>Name</th>
+<th>Email</th>
+<th>Role</th>
+<th>Action</th>
 </tr>
 
 <?php while($row = $result->fetch_assoc()): ?>
 <tr>
-    <td><?= $row['user_id'] ?></td>
-    <td><?= htmlspecialchars($row['full_name']) ?></td>
-    <td><?= htmlspecialchars($row['email']) ?></td>
-    <td><?= $row['role'] ?></td>
-    <td><?= $row['created_at'] ?></td>
-    <td>
-        <?php if ($row['user_id'] != $_SESSION['user_id']): ?>
-            <a class="delete-btn" href="?delete=<?= $row['user_id'] ?>" onclick="return confirm('Delete this user?')">
-                Delete
-            </a>
-        <?php else: ?>
-            (You)
-        <?php endif; ?>
-    </td>
+<td><?= $row['user_id'] ?></td>
+<td><?= htmlspecialchars($row['full_name']) ?></td>
+<td><?= htmlspecialchars($row['email']) ?></td>
+
+<td class="role-<?= $row['role'] ?>">
+    <?= ucfirst($row['role']) ?>
+</td>
+
+<td>
+    <button onclick="toggleEdit(<?= $row['user_id'] ?>)">Edit</button>
+
+    <?php if ($row['user_id'] != $_SESSION['user_id']): ?>
+        <a href="?delete=<?= $row['user_id'] ?>" onclick="return confirm('Delete?')">Delete</a>
+    <?php endif; ?>
+
+    <!-- EDIT FORM -->
+    <form method="POST" id="edit-<?= $row['user_id'] ?>" class="edit-form">
+        <input type="hidden" name="user_id" value="<?= $row['user_id'] ?>">
+        <input type="text" name="full_name" value="<?= $row['full_name'] ?>">
+        <input type="email" name="email" value="<?= $row['email'] ?>">
+
+        <select name="role">
+            <option value="citizen">Citizen</option>
+            <option value="authority">Authority</option>
+            <option value="admin">Admin</option>
+        </select>
+
+        <button name="update_user">Update</button>
+    </form>
+</td>
 </tr>
 <?php endwhile; ?>
 
