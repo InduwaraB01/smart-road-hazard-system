@@ -94,7 +94,7 @@ $resolved = $conn->query("SELECT COUNT(*) as count FROM hazards WHERE status='Re
     Welcome, <?php echo $_SESSION['full_name']; ?> |
     <a href="dashboard.php">Dashboard</a>
     <a href="manage_reports.php">Manage Reports</a>
-    <a href="map.php">Map</a>
+    <a href="map_view.php">Map</a>
     <a href="change_password.php">Change Password</a>
     <a href="../logout.php">Logout</a>
 </div>
