@@ -170,13 +170,15 @@ function toggleEdit(id) {
 
 </head>
 <body>
-
-<div class="navbar">
+    <div class="navbar">
     <a href="dashboard.php">Dashboard</a>
     <a href="manage_users.php">Users</a>
     <a href="manage_categories.php">Categories</a>
     <a href="manage_reports.php">Reports</a>
+    <a href="change_password.php">Change Password</a>
     <a href="../logout.php">Logout</a>
+</div>
+
 </div>
 <h2 style="color: white;">Manage Users</h2>
 <div class="container">

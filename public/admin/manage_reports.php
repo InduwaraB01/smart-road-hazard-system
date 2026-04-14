@@ -64,7 +64,7 @@ $result = $conn->query($sql);
             color: white;
             margin-right: 15px;
             text-decoration: none;
-            font-weight: bold;
+            
         }
 
         .container {
