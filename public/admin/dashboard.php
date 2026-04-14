@@ -94,7 +94,7 @@ $resolved = $conn->query("SELECT COUNT(*) as c FROM hazards WHERE status='Resolv
     <a href="manage_categories.php">Manage Categories</a>
     <a href="manage_reports.php">Manage Reports</a>
     <a href="change_password.php">Change Password</a>
-    <a href="../logout.php">Logout</a>
+    <a href="../login.php">Logout</a>
 </div>
 
 <div class="container">

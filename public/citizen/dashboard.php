@@ -76,7 +76,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'citizen') {
 <div class="navbar">
     Welcome, <?php echo $_SESSION['full_name']; ?> |
     <a href="dashboard.php">Dashboard</a>
-    <a href="report_hazard.php">Report Hazard</a>
+    <a href="report_hazards.php">Report Hazard</a>
     <a href="my_reports.php">My Reports</a>
     <a href="../login.php">Logout</a>
 </div>

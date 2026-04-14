@@ -176,7 +176,7 @@ function toggleEdit(id) {
     <a href="manage_categories.php">Categories</a>
     <a href="manage_reports.php">Reports</a>
     <a href="change_password.php">Change Password</a>
-    <a href="../logout.php">Logout</a>
+    <a href="../login.php">Logout</a>
 </div>
 
 </div>

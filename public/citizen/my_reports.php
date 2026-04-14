@@ -95,7 +95,7 @@ $result = $conn->query($sql);
 
 <div class="navbar">
     <a href="dashboard.php">Dashboard</a>
-    <a href="report_hazard.php">Report Hazard</a>
+    <a href="report_hazards.php">Report Hazard</a>
     <a href="my_reports.php">My Reports</a>
     <a href="../logout.php">Logout</a>
 </div>
