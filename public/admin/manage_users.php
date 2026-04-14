@@ -92,7 +92,7 @@ if ($search != "") {
 body {
     margin: 0;
     font-family: Arial;
-    background: url('../../assets/images/admin-bg.jpg') no-repeat center/cover;
+    background: url('../../assets/images/road2.jpg') no-repeat center/cover;
 }
 
 .navbar {
@@ -178,9 +178,8 @@ function toggleEdit(id) {
     <a href="manage_reports.php">Reports</a>
     <a href="../logout.php">Logout</a>
 </div>
-<h2>Manage Users</h2>
+<h2 style="color: white;">Manage Users</h2>
 <div class="container">
-
 
 
 <p style="color:lightgreen;"><?php echo $success; ?></p>
