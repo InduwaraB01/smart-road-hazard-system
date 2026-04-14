@@ -118,7 +118,7 @@ $resolved = $conn->query("SELECT COUNT(*) as count FROM hazards WHERE status='Re
         </div>
 
         <div class="card">
-            <img src="../../assets/images/in_progress.png">
+            <img src="../../assets/images/in-progress.png">
             <h3>In Progress</h3>
             <p><?php echo $progress; ?></p>
         </div>

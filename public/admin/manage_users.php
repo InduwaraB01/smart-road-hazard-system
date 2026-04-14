@@ -178,10 +178,10 @@ function toggleEdit(id) {
     <a href="manage_reports.php">Reports</a>
     <a href="../logout.php">Logout</a>
 </div>
-
+<h2>Manage Users</h2>
 <div class="container">
 
-<h2>Manage Users</h2>
+
 
 <p style="color:lightgreen;"><?php echo $success; ?></p>
 <p style="color:red;"><?php echo $error; ?></p>

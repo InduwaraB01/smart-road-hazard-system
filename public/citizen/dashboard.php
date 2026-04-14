@@ -17,7 +17,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'citizen') {
         body {
             margin: 0;
             font-family: Arial;
-            background: url('../../assets/images/road2.jpg') no-repeat center center/cover;
+            background: url('../../assets/images/road1.jpg') no-repeat center center/cover;
         }
 
         .navbar {
