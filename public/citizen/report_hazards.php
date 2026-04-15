@@ -1,7 +1,8 @@
 <?php
 session_start();
-include("../../config/db.php");
+include(__DIR__ . "/../../config/db.php");
 
+// Restrict access
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'citizen') {
     header("Location: ../login.php");
     exit();
@@ -22,7 +23,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $latitude = $_POST['latitude'];
     $longitude = $_POST['longitude'];
 
-    // Validate image upload
     if (!isset($_FILES['hazard_image']) || $_FILES['hazard_image']['error'] != 0) {
         $error = "Please upload a valid image.";
     } else {
@@ -41,7 +41,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error = "File size must be less than 2MB.";
         } else {
 
-            // Create unique filename
             $new_image_name = time() . "_" . rand(1000,9999) . "." . $image_ext;
             $upload_path = $upload_dir . $new_image_name;
 
@@ -53,8 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     (user_id, category_id, description, severity, latitude, longitude, image_path) 
                     VALUES (?, ?, ?, ?, ?, ?, ?)");
 
-                $stmt->bind_param(
-                    "iissdds",
+                $stmt->bind_param("iissdds",
                     $user_id,
                     $category_id,
                     $description,
@@ -67,11 +65,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($stmt->execute()) {
                     $success = "Hazard reported successfully!";
                 } else {
-                    $error = "Database error: " . $stmt->error;
+                    $error = "Database error!";
                 }
 
                 $stmt->close();
-
             } else {
                 $error = "Image upload failed.";
             }
@@ -83,23 +80,90 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Report Road Hazard</title>
+    <title>Report Hazard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: url('../../assets/images/road.jpg') no-repeat center/cover;
+            color: white;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(0,0,0,0.8);
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        input, select, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            background: green;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .back-btn {
+            background: #555;
+        }
+
+        .success {
+            color: lightgreen;
+        }
+
+        .error {
+            color: red;
+        }
+
+        #map {
+            width: 100%;
+            height: 350px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+    </style>
 </head>
+
 <body>
+
+<!-- NAVBAR -->
+<?php include(__DIR__ . "/../includes/navbar.php"); ?>
+
+<div class="container">
+
+<div class="card">
 
 <h2>Report Road Hazard</h2>
 
 <?php if ($success): ?>
-    <p style="color: green;"><?php echo $success; ?></p>
+    <p class="success"><?php echo $success; ?></p>
 <?php endif; ?>
 
 <?php if ($error): ?>
-    <p style="color: red;"><?php echo $error; ?></p>
+    <p class="error"><?php echo $error; ?></p>
 <?php endif; ?>
 
 <form method="POST" enctype="multipart/form-data">
 
-    <label>Category:</label><br>
+    <label>Category</label>
     <select name="category_id" required>
         <option value="">Select Category</option>
         <?php while($row = $categories->fetch_assoc()): ?>
@@ -108,43 +172,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </option>
         <?php endwhile; ?>
     </select>
-    <br><br>
 
-    <label>Description:</label><br>
-    <textarea name="description" required></textarea>
-    <br><br>
+    <label>Description</label>
+    <textarea name="description" placeholder="Describe the hazard..." required></textarea>
 
-    <label>Severity:</label><br>
+    <label>Severity</label>
     <select name="severity" required>
         <option value="Low">Low</option>
         <option value="Medium">Medium</option>
         <option value="High">High</option>
     </select>
-    <br><br>
 
-    <label>Select Hazard Location:</label><br>
-<div id="map" style="width:100%; height:400px;"></div>
-<br>
+    <label>Select Location on Map</label>
+    <div id="map"></div>
 
-<input type="hidden" name="latitude" id="latitude" required>
-<input type="hidden" name="longitude" id="longitude" required>
+    <input type="hidden" name="latitude" id="latitude" required>
+    <input type="hidden" name="longitude" id="longitude" required>
 
-
-    <label>Upload Photo (Proof):</label><br>
+    <label>Upload Image</label>
     <input type="file" name="hazard_image" accept="image/*" required>
-    <br><br>
 
     <button type="submit">Submit Report</button>
-    <button type="button" onclick="window.location.href='dashboard.php'">Back to Dashboard</button>
+    <button type="button" class="back-btn" onclick="window.location.href='dashboard.php'">
+        Back to Dashboard
+    </button>
 
 </form>
+
+</div>
+
+</div>
 
 <script>
 let map;
 let marker;
 
 function initMap() {
-    const defaultLocation = { lat: 6.9271, lng: 79.8612 };
+    
+const defaultLocation = { lat: 51.4545, lng: -2.5879 };
 
     map = new google.maps.Map(document.getElementById("map"), {
         zoom: 12,
@@ -152,28 +217,26 @@ function initMap() {
     });
 
     map.addListener("click", function(event) {
-        const clickedLocation = event.latLng;
+        const lat = event.latLng.lat();
+        const lng = event.latLng.lng();
 
-        document.getElementById("latitude").value = clickedLocation.lat();
-        document.getElementById("longitude").value = clickedLocation.lng();
+        document.getElementById("latitude").value = lat;
+        document.getElementById("longitude").value = lng;
 
-        if (marker) {
-            marker.setMap(null);
-        }
+        if (marker) marker.setMap(null);
 
         marker = new google.maps.Marker({
-            position: clickedLocation,
+            position: { lat, lng },
             map: map,
         });
     });
 }
 </script>
 
+
 <script async
 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhRBe6aJUCBV2ue8RJdocUdh3xiGhuHE4&callback=initMap">
 </script>
-
-
 
 </body>
 </html>
