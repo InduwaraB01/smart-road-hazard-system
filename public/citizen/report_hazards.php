@@ -86,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         body {
             margin: 0;
             font-family: Arial;
-            background: url('../../assets/images/road.jpg') no-repeat center/cover;
+            background: url('../../assets/images/bg.jpg') no-repeat center/cover;
             color: white;
         }
 
@@ -144,8 +144,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <body>
 
-<!-- NAVBAR -->
-<?php include(__DIR__ . "/../includes/navbar.php"); ?>
 
 <div class="container">
 
