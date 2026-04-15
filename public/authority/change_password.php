@@ -82,6 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <input type="password" name="confirm_password" required><br><br>
 
     <button type="submit">Update Password</button>
+    <button type="button" onclick="window.location.href='dashboard.php'">Cancel</button>
 </form>
 
 </body>

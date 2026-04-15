@@ -130,7 +130,7 @@ $result = $conn->query($sql);
     <a href="dashboard.php">Dashboard</a>
     <a href="map_view.php">Map</a>
     <a href="change_password.php">Change Password</a>
-    <a href="../logout.php">Logout</a>
+    <a href="../login.php">Logout</a>
 </div>
 
 <div class="container">
